@@ -1,8 +1,13 @@
-const { Octokit } = require('@octokit/rest');
-const matter = require('gray-matter');
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+import { Octokit } from '@octokit/rest';
+import matter from 'gray-matter';
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import { fileURLToPath } from 'url';
+
+// Configurazione per __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configurazione
 const octokit = new Octokit({
