@@ -126,6 +126,9 @@ function determineCategory(repoTopics, description) {
 // Funzione principale per l'aggiornamento del portfolio
 async function updatePortfolio() {
   try {
+    console.log('Starting portfolio update...');
+    console.log(`Fetching repositories for organization: ${ORGANIZATION}`);
+
     // Ottieni tutti i repository pubblici dell'organizzazione
     const { data: repos } = await octokit.repos.listForOrg({
       org: ORGANIZATION,
@@ -134,13 +137,19 @@ async function updatePortfolio() {
       per_page: 100
     });
 
+    console.log(`Found ${repos.length} public repositories`);
+    repos.forEach(repo => console.log(`- ${repo.name}`));
+
     const portfolioData = [];
     let priority = 1;
 
     for (const repo of repos) {
       try {
+        console.log(`\nProcessing repository: ${repo.name}`);
+        
         // Ignora il repository del sito principale
         if (repo.name === `${ORGANIZATION}.github.io`) {
+          console.log('Skipping main website repository');
           continue;
         }
 
@@ -149,28 +158,34 @@ async function updatePortfolio() {
 
         try {
           // Prova a ottenere il project-info.md
+          console.log('Attempting to fetch project-info.md...');
           const { data: projectInfoResponse } = await octokit.repos.getContent({
             owner: ORGANIZATION,
             repo: repo.name,
             path: 'project-info.md',
           });
           content = Buffer.from(projectInfoResponse.content, 'base64').toString();
+          console.log('Found project-info.md');
         } catch (error) {
           // Se non esiste, crea un project-info.md di default
-          console.log(`No project-info.md found for ${repo.name}, using default template`);
+          console.log('No project-info.md found, using default template');
           content = DEFAULT_PROJECT_INFO(repo.name, repo.description);
         }
 
         projectInfo = validateProjectInfo(content);
+        console.log('Project info validated successfully');
 
         // Ottieni i topics del repository
+        console.log('Fetching repository topics...');
         const { data: topicsData } = await octokit.repos.getAllTopics({
           owner: ORGANIZATION,
           repo: repo.name,
         });
+        console.log(`Topics found: ${topicsData.names.join(', ') || 'none'}`);
 
         // Determina la categoria del progetto
         const category = determineCategory(topicsData.names, repo.description || '');
+        console.log(`Determined category: ${category}`);
 
         // Gestione delle immagini
         const mediaFolder = path.join('public', 'portfolio-media', repo.name);
@@ -179,7 +194,8 @@ async function updatePortfolio() {
         }
 
         // Download e gestione dei media
-        if (projectInfo.media) {
+        if (projectInfo.media && projectInfo.media.length > 0) {
+          console.log('Processing media files...');
           for (const media of projectInfo.media) {
             if (media.type === 'image') {
               const fileName = path.basename(media.url);
@@ -192,6 +208,7 @@ async function updatePortfolio() {
                 
                 await downloadFile(mediaUrl, localPath);
                 media.url = `/portfolio-media/${repo.name}/${fileName}`;
+                console.log(`Downloaded media: ${fileName}`);
               }
             }
           }
@@ -210,14 +227,20 @@ async function updatePortfolio() {
           tags: [...new Set([...projectInfo.tags, ...topicsData.names])], // Unione dei tag con i topics
         };
 
+        console.log('Project data compiled:', projectData);
         portfolioData.push(projectData);
+        console.log('Project added to portfolio data');
       } catch (error) {
         console.error(`Error processing ${repo.name}:`, error.message);
+        console.error(error.stack);
       }
     }
 
     // Ordina i progetti per data di ultimo aggiornamento
     portfolioData.sort((a, b) => new Date(b.lastUpdate) - new Date(a.lastUpdate));
+
+    console.log('\nWriting portfolio data...');
+    console.log(`Total projects: ${portfolioData.length}`);
 
     // Salva i dati aggiornati
     fs.writeFileSync(
@@ -228,6 +251,7 @@ async function updatePortfolio() {
     console.log('Portfolio data updated successfully!');
   } catch (error) {
     console.error('Error updating portfolio:', error);
+    console.error(error.stack);
     throw error;
   }
 }

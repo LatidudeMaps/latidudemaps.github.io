@@ -15,6 +15,12 @@ on:
 jobs:
   update-portfolio:
     runs-on: ubuntu-latest
+    # Richiede permessi per accedere ai repository e alle GitHub Pages
+    permissions:
+      contents: write
+      pages: write
+      repository-projects: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,7 +38,10 @@ jobs:
         run: mkdir -p public/portfolio-media
 
       - name: Update portfolio data
-        run: node .github/scripts/update-portfolio-auto.js
+        run: |
+          echo "Starting portfolio update with token permissions:"
+          echo "Token Permissions: ${{ toJson(github.token_permissions) }}"
+          node .github/scripts/update-portfolio-auto.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
