@@ -1,148 +1,65 @@
 [
   {
-    "id": "latidudemaps.github.io",
-    "title": "latidudemaps.github.io",
-    "description": "Un progetto di LatidudeMaps",
+    "id": "maplibre_template",
+    "title": "Maplibre Template",
+    "description": "Template per una mappa interattiva con MapLibre",
     "imageUrl": "/images/portfolio/placeholder.svg",
-    "category": "other",
-    "tags": [
-      "Work in Progress"
-    ],
+    "category": "map",
+    "technologies": ["JavaScript", "MapLibre GL JS", "CSS", "HTML"],
+    "tags": ["template", "map", "webgis", "interactive"],
     "year": 2025,
-    "link": "https://LatidudeMaps.github.io/latidudemaps.github.io/",
+    "link": "https://LatidudeMaps.github.io/maplibre_template/",
+    "githubUrl": "https://github.com/LatidudeMaps/maplibre_template",
     "features": [
-      "Questo progetto fa parte del portfolio di LatidudeMaps.",
-      "Maggiori informazioni in arrivo!"
+      "Mappa interattiva con MapLibre GL JS",
+      "Personalizzazione dello stile cartografico",
+      "Controlli per navigazione e zoom"
     ],
-    "technologies": [
-      "Web"
-    ],
-    "isTemplate": false,
-    "lastUpdate": "2025-03-17T14:24:23Z",
-    "githubUrl": "https://github.com/LatidudeMaps/latidudemaps.github.io",
+    "isTemplate": true,
+    "lastUpdate": "2025-03-15T13:06:04Z",
     "status": "active",
     "priority": 1
   },
   {
-    "id": "maplibre_template",
-    "title": "maplibre_template",
-    "description": "Template per una mappa interattiva con MapLibre",
+    "id": "GeologiaVDA",
+    "title": "Geologia VDA",
+    "description": "3D Geological Map of Val d'Agri (Basilicata, Italy) - CC BY-NC-ND 4.0",
     "imageUrl": "/images/portfolio/placeholder.svg",
     "category": "map",
-    "tags": [
-      "Work in Progress"
-    ],
+    "technologies": ["JavaScript", "Mapbox GL JS", "Three.js", "GeoJSON"],
+    "tags": ["geology", "3D", "map", "italy"],
     "year": 2025,
-    "link": "https://LatidudeMaps.github.io/maplibre_template/",
+    "link": "https://LatidudeMaps.github.io/GeologiaVDA/",
+    "githubUrl": "https://github.com/LatidudeMaps/GeologiaVDA",
     "features": [
-      "Questo progetto fa parte del portfolio di LatidudeMaps.",
-      "Maggiori informazioni in arrivo!"
+      "Visualizzazione 3D di dati geologici",
+      "Interattività con i livelli geologici",
+      "Informazioni dettagliate sui diversi strati"
     ],
-    "technologies": [
-      "Web",
-      "mapping",
-      "ciao"
-    ],
-    "isTemplate": true,
-    "lastUpdate": "2025-03-15T13:06:04Z",
-    "githubUrl": "https://github.com/LatidudeMaps/maplibre_template",
+    "isTemplate": false,
+    "lastUpdate": "2025-03-08T16:33:02Z",
     "status": "active",
     "priority": 2
   },
   {
-    "id": "MountainAtlas",
-    "title": "MountainAtlas",
-    "description": "Un progetto di LatidudeMaps",
-    "imageUrl": "/images/portfolio/placeholder.svg",
-    "category": "other",
-    "tags": [
-      "Work in Progress"
-    ],
-    "year": 2025,
-    "link": "https://LatidudeMaps.github.io/MountainAtlas/",
-    "features": [
-      "Questo progetto fa parte del portfolio di LatidudeMaps.",
-      "Maggiori informazioni in arrivo!"
-    ],
-    "technologies": [
-      "Web"
-    ],
-    "isTemplate": false,
-    "lastUpdate": "2025-03-08T16:33:05Z",
-    "githubUrl": "https://github.com/LatidudeMaps/MountainAtlas",
-    "status": "active",
-    "priority": 3
-  },
-  {
-    "id": "GeologiaVDA",
-    "title": "GeologiaVDA",
-    "description": "3D Geological Map of Val d'Agri (Basilicata, Italy) - CC BY-NC-ND 4.0",
-    "imageUrl": "/images/portfolio/placeholder.svg",
-    "category": "map",
-    "tags": [
-      "Work in Progress"
-    ],
-    "year": 2025,
-    "link": "https://LatidudeMaps.github.io/GeologiaVDA/",
-    "features": [
-      "Questo progetto fa parte del portfolio di LatidudeMaps.",
-      "Maggiori informazioni in arrivo!"
-    ],
-    "technologies": [
-      "Web"
-    ],
-    "isTemplate": false,
-    "lastUpdate": "2025-03-08T16:33:02Z",
-    "githubUrl": "https://github.com/LatidudeMaps/GeologiaVDA",
-    "status": "active",
-    "priority": 4
-  },
-  {
     "id": "30DayMapChallenge",
-    "title": "30DayMapChallenge",
+    "title": "30 Day Map Challenge",
     "description": "All my @30DayMapChallenge 2022 entries",
     "imageUrl": "/images/portfolio/placeholder.svg",
     "category": "map",
-    "tags": [
-      "Work in Progress"
-    ],
-    "year": 2025,
+    "technologies": ["QGIS", "R", "JavaScript", "GIS"],
+    "tags": ["challenge", "creative", "cartography"],
+    "year": 2022,
     "link": "https://LatidudeMaps.github.io/30DayMapChallenge/",
+    "githubUrl": "https://github.com/LatidudeMaps/30DayMapChallenge",
     "features": [
-      "Questo progetto fa parte del portfolio di LatidudeMaps.",
-      "Maggiori informazioni in arrivo!"
-    ],
-    "technologies": [
-      "Web"
+      "30 mappe diverse create in 30 giorni",
+      "Utilizzo di diverse tecnologie cartografiche",
+      "Esplorazione di temi e stili vari"
     ],
     "isTemplate": false,
     "lastUpdate": "2024-11-01T00:21:34Z",
-    "githubUrl": "https://github.com/LatidudeMaps/30DayMapChallenge",
     "status": "active",
-    "priority": 5
-  },
-  {
-    "id": "RandomMaps_2023",
-    "title": "RandomMaps_2023",
-    "description": "Here are stored my random exercises in full resolution",
-    "imageUrl": "/images/portfolio/placeholder.svg",
-    "category": "other",
-    "tags": [
-      "Work in Progress"
-    ],
-    "year": 2025,
-    "link": "https://LatidudeMaps.github.io/RandomMaps_2023/",
-    "features": [
-      "Questo progetto fa parte del portfolio di LatidudeMaps.",
-      "Maggiori informazioni in arrivo!"
-    ],
-    "technologies": [
-      "Web"
-    ],
-    "isTemplate": false,
-    "lastUpdate": "2023-01-17T12:29:45Z",
-    "githubUrl": "https://github.com/LatidudeMaps/RandomMaps_2023",
-    "status": "active",
-    "priority": 6
+    "priority": 3
   }
 ]

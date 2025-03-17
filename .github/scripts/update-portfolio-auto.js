@@ -331,10 +331,8 @@ async function updatePortfolio() {
           technologies: flattenTechStack(techStack),
           tags: [...new Set(topics)],
           year: new Date(repo.created_at).getFullYear(),
-          links: {
-            github: repo.html_url,
-            live: `https://${USERNAME}.github.io/${repo.name}/`
-          },
+          link: `https://${USERNAME}.github.io/${repo.name}/`,
+          githubUrl: repo.html_url,
           features: features,
           isTemplate: repo.name.toLowerCase().includes('template') || repo.is_template,
           lastUpdate: repo.updated_at,
