@@ -1,13 +1,13 @@
 name: Update Portfolio Data
 
 on:
-  # Si attiva quando viene fatto push su qualsiasi repository con GitHub Pages
+  # Si attiva quando viene fatto push su qualsiasi repository
   repository_dispatch:
     types: [pages_built]
   
-  # Si attiva una volta al giorno alle 00:00 UTC
+  # Si attiva ogni 6 ore
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 */6 * * *'
   
   # Permette l'attivazione manuale
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
         run: mkdir -p public/portfolio-media
 
       - name: Update portfolio data
-        run: npm run update-portfolio
+        run: node .github/scripts/update-portfolio-auto.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,4 +53,4 @@ jobs:
       - name: Check for validation errors
         if: failure()
         run: |
-          echo "::error::Portfolio update failed. Please check the project-info.md files in your repositories for validation errors."
+          echo "::error::Portfolio update failed. Please check the logs for more details."
