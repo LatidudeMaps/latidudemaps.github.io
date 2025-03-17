@@ -31,10 +31,25 @@ export default function Portfolio() {
     const loadProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/data/portfolio-data.json');
+        // Carica direttamente dall'URL raw di GitHub
+        const githubRawUrl = 'https://raw.githubusercontent.com/LatidudeMaps/latidudemaps.github.io/main/public/data/portfolio-data.json';
+        const localUrl = '/data/portfolio-data.json';
+        
+        // Prima prova GitHub Raw, poi fallback al percorso locale
+        let response = await fetch(githubRawUrl);
+        
+        // Se fallisce, prova il percorso locale
+        if (!response.ok) {
+          console.log('Caricamento da GitHub fallito, tentativo con percorso locale');
+          response = await fetch(localUrl);
+        }
+        
         if (response.ok) {
           const dynamicProjects = await response.json();
+          console.log('Progetti caricati:', dynamicProjects.length);
           setProjects(dynamicProjects);
+        } else {
+          console.error('Impossibile caricare i dati del portfolio:', response.status);
         }
       } catch (error) {
         console.error('Errore nel caricamento dei progetti:', error);
