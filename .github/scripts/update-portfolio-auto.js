@@ -1,5 +1,4 @@
 import { Octokit } from '@octokit/rest';
-import matter from 'gray-matter';
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
@@ -16,50 +15,6 @@ const octokit = new Octokit({
 
 const USERNAME = 'LatidudeMaps';
 const OUTPUT_PATH = 'public/data/portfolio-data.json';
-
-// Template per project-info.md di default
-const DEFAULT_PROJECT_INFO = (repoName, description = '') => `---
-title: ${repoName}
-description: ${description || 'Un progetto di LatidudeMaps'}
-startDate: ${new Date().toISOString().split('T')[0]}
-status: active
-category: other
-
-techStack:
-  core:
-    - JavaScript
-  mapping:
-    - MapLibre GL JS
-  styling:
-    - CSS
-  deployment:
-    - GitHub Pages
-
-tags:
-  - webgis
-  - template
-
-features:
-  - Feature principale da definire
-  - Altre feature da aggiungere
-
-links:
-  live: https://${USERNAME}.github.io/${repoName}/
-
-media:
-  - type: image
-    url: images/placeholder.png
-    description: Screenshot del progetto
-
-longDescription: |
-  ${description || 'Documentazione del progetto in arrivo.'}
-  
-  Altre informazioni verranno aggiunte presto.
----
-
-# ${repoName}
-Documentazione completa in arrivo.
-`;
 
 // Funzione per scaricare un file
 async function downloadFile(url, dest) {
@@ -78,7 +33,171 @@ async function downloadFile(url, dest) {
   });
 }
 
-// Funzione per appiattire l'oggetto techStack in un array
+// Funzione per determinare la categoria del progetto basata su topics e linguaggi
+async function determineCategory(repo, topics) {
+  const categoryKeywords = {
+    map: ['map', 'maps', 'maplibre', 'leaflet', 'gis', 'geospatial', 'mapbox', 'webgis', 'geodata'],
+    visualization: ['visualization', 'chart', 'graph', 'plot', 'dashboard', '3d', 'three', 'visual', 'd3', 'dataviz'],
+    analysis: ['analysis', 'data', 'statistics', 'analytics', 'pandas', 'numpy', 'geopandas', 'processing'],
+    tool: ['tool', 'utility', 'helper', 'plugin', 'template', 'library', 'cli', 'command-line']
+  };
+
+  // Ottieni i linguaggi usati nel repository
+  let languages = [];
+  try {
+    const { data: languagesData } = await octokit.repos.listLanguages({
+      owner: USERNAME,
+      repo: repo.name
+    });
+    languages = Object.keys(languagesData);
+    console.log(`Languages found: ${languages.join(', ')}`);
+  } catch (error) {
+    console.warn(`Could not fetch languages for ${repo.name}: ${error.message}`);
+  }
+  
+  // Mappa i linguaggi alle possibili categorie
+  const mappingLanguages = ['javascript', 'typescript', 'html', 'css'];
+  const dataLanguages = ['python', 'r', 'julia'];
+  const vizLanguages = ['javascript', 'typescript', 'd3', 'three.js'];
+  
+  // Controlla nei topics del repository
+  for (const [category, keywords] of Object.entries(categoryKeywords)) {
+    if (topics.some(topic => keywords.includes(topic.toLowerCase()))) {
+      return category;
+    }
+  }
+  
+  // Verifica dalla descrizione
+  const descLower = (repo.description || '').toLowerCase();
+  for (const [category, keywords] of Object.entries(categoryKeywords)) {
+    if (keywords.some(keyword => descLower.includes(keyword))) {
+      return category;
+    }
+  }
+  
+  // Tenta di dedurre dai linguaggi
+  if (languages.some(lang => mappingLanguages.includes(lang.toLowerCase())) && 
+      (topics.includes('map') || topics.includes('gis') || descLower.includes('map'))) {
+    return 'map';
+  }
+  
+  if (languages.some(lang => dataLanguages.includes(lang.toLowerCase()))) {
+    return 'analysis';
+  }
+  
+  if (languages.some(lang => vizLanguages.includes(lang.toLowerCase()))) {
+    return 'visualization';
+  }
+  
+  // Default
+  return 'other';
+}
+
+// Funzione per ottenere il contenuto di un README
+async function getReadmeContent(owner, repo) {
+  try {
+    const { data } = await octokit.repos.getReadme({
+      owner,
+      repo,
+      mediaType: { format: 'raw' }
+    });
+    return data;
+  } catch (error) {
+    console.warn(`README not found for ${repo}: ${error.message}`);
+    return 'Informazioni non disponibili';
+  }
+}
+
+// Funzione per estrarre le caratteristiche dal README
+function extractFeaturesFromReadme(readmeContent) {
+  const features = [];
+  
+  // Cerca sezioni come "Features", "Caratteristiche", "Funzionalità"
+  const featureSectionRegex = /#+\s*(Features|Caratteristiche|Funzionalità|What it does)/i;
+  const featureMatch = readmeContent.match(featureSectionRegex);
+  
+  if (featureMatch) {
+    const featureSectionStart = featureMatch.index;
+    const nextSectionRegex = /#+\s*[A-Za-z]/g;
+    nextSectionRegex.lastIndex = featureSectionStart + featureMatch[0].length;
+    
+    const nextSectionMatch = nextSectionRegex.exec(readmeContent);
+    const featureSectionEnd = nextSectionMatch ? nextSectionMatch.index : readmeContent.length;
+    
+    const featureSection = readmeContent.substring(featureSectionStart, featureSectionEnd);
+    
+    // Estrai elementi di lista
+    const listItemRegex = /[-*]\s*([^\n]+)/g;
+    let listItemMatch;
+    
+    while ((listItemMatch = listItemRegex.exec(featureSection)) !== null) {
+      features.push(listItemMatch[1].trim());
+    }
+  }
+  
+  // Se non trova nulla, restituisci un elemento predefinito
+  if (features.length === 0) {
+    features.push('Caratteristiche non specificate');
+  }
+  
+  return features.slice(0, 5); // Limita a 5 caratteristiche
+}
+
+// Funzione per organizzare i linguaggi in un techStack strutturato
+function organizeTechStack(languages, topics) {
+  const techStack = {
+    core: [],
+    mapping: [],
+    visualization: [],
+    frameworks: [],
+    styling: [],
+    dataProcessing: [],
+    deployment: []
+  };
+  
+  // Mappatura di linguaggi e tecnologie alle categorie del tech stack
+  const mappings = {
+    core: ['javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'go', 'rust'],
+    mapping: ['maplibre', 'leaflet', 'mapbox', 'openlayers', 'arcgis', 'qgis', 'gis'],
+    visualization: ['d3', 'three.js', 'plotly', 'chart.js', 'highcharts', 'tableau', 'powerbi'],
+    frameworks: ['react', 'vue', 'angular', 'svelte', 'next.js', 'nuxt', 'django', 'flask', 'express'],
+    styling: ['css', 'scss', 'sass', 'less', 'tailwind', 'bootstrap', 'styled-components'],
+    dataProcessing: ['pandas', 'numpy', 'scipy', 'geopandas', 'r', 'julia', 'matlab', 'sql'],
+    deployment: ['github-pages', 'netlify', 'vercel', 'aws', 'azure', 'gcp', 'heroku', 'docker']
+  };
+  
+  // Aggiungi linguaggi alle categorie appropriate
+  for (const lang of languages) {
+    const langLower = lang.toLowerCase();
+    
+    for (const [category, techs] of Object.entries(mappings)) {
+      if (techs.includes(langLower)) {
+        techStack[category].push(lang);
+        break;
+      }
+    }
+  }
+  
+  // Aggiungi topics alle categorie appropriate
+  for (const topic of topics) {
+    const topicLower = topic.toLowerCase();
+    
+    for (const [category, techs] of Object.entries(mappings)) {
+      if (techs.includes(topicLower) && !techStack[category].includes(topic)) {
+        techStack[category].push(topic);
+      }
+    }
+  }
+  
+  // Assicuriamoci che GitHub Pages sia nei deployment se è un sito su GitHub Pages
+  if (!techStack.deployment.includes('GitHub Pages')) {
+    techStack.deployment.push('GitHub Pages');
+  }
+  
+  return techStack;
+}
+
+// Funzione per ottenere tutti i linguaggi dagli stack
 function flattenTechStack(techStack) {
   if (!techStack) return [];
   
@@ -92,144 +211,49 @@ function flattenTechStack(techStack) {
     .filter(Boolean);
 }
 
-// Funzione per validare e sistemare il project-info.md
-function validateProjectInfo(content) {
-  const { data } = matter(content);
-  const requiredFields = [
-    'title',
-    'description',
-    'startDate',
-    'status',
-    'category',
-    'techStack',
-    'tags',
-    'features',
-    'links',
-    'media',
-    'longDescription'
+// Funzione per ottenere screenshot dalla repo se esistono
+async function getThumbnailImage(repo) {
+  const possiblePaths = [
+    'screenshot.png',
+    'screenshot.jpg',
+    'thumbnail.png',
+    'thumbnail.jpg',
+    'preview.png',
+    'preview.jpg',
+    'images/screenshot.png',
+    'images/screenshot.jpg',
+    'assets/images/screenshot.png',
+    'docs/images/screenshot.png'
   ];
-
-  const validatedData = { ...data };
-
-  // Valida e correggi i campi mancanti
-  requiredFields.forEach(field => {
-    if (!validatedData[field]) {
-      console.warn(`Warning: Missing field '${field}', using default value`);
-      switch(field) {
-        case 'title':
-          validatedData.title = 'Untitled Project';
-          break;
-        case 'description':
-          validatedData.description = 'Un progetto di LatidudeMaps';
-          break;
-        case 'startDate':
-          validatedData.startDate = new Date().toISOString().split('T')[0];
-          break;
-        case 'status':
-          validatedData.status = 'active';
-          break;
-        case 'category':
-          validatedData.category = 'other';
-          break;
-        case 'techStack':
-          validatedData.techStack = {
-            core: ['JavaScript'],
-            deployment: ['GitHub Pages']
-          };
-          break;
-        case 'tags':
-          validatedData.tags = ['Work in Progress'];
-          break;
-        case 'features':
-          validatedData.features = ['Feature da definire'];
-          break;
-        case 'links':
-          validatedData.links = {};
-          break;
-        case 'media':
-          validatedData.media = [];
-          break;
-        case 'longDescription':
-          validatedData.longDescription = 'Documentazione del progetto in arrivo.';
-          break;
+  
+  for (const imagePath of possiblePaths) {
+    try {
+      const { data: imageData } = await octokit.repos.getContent({
+        owner: USERNAME,
+        repo: repo.name,
+        path: imagePath
+      });
+      
+      if (imageData && imageData.download_url) {
+        // Crea la cartella se non esiste
+        const mediaFolder = path.join('public', 'portfolio-media', repo.name);
+        if (!fs.existsSync(mediaFolder)) {
+          fs.mkdirSync(mediaFolder, { recursive: true });
+        }
+        
+        // Scarica l'immagine
+        const fileName = path.basename(imagePath);
+        const localPath = path.join(mediaFolder, fileName);
+        await downloadFile(imageData.download_url, localPath);
+        
+        return `/portfolio-media/${repo.name}/${fileName}`;
       }
-    }
-  });
-
-  // Valida la struttura del techStack
-  const validTechCategories = [
-    'core',
-    'mapping',
-    'visualization',
-    'frameworks',
-    'styling',
-    'dataProcessing',
-    'deployment'
-  ];
-
-  if (typeof validatedData.techStack !== 'object') {
-    validatedData.techStack = {};
-  }
-
-  validTechCategories.forEach(category => {
-    if (!validatedData.techStack[category]) {
-      validatedData.techStack[category] = [];
-    } else if (!Array.isArray(validatedData.techStack[category])) {
-      validatedData.techStack[category] = [validatedData.techStack[category]].filter(Boolean);
-    }
-  });
-
-  // Assicurati che i campi array siano effettivamente array
-  ['tags', 'features', 'media'].forEach(field => {
-    if (!Array.isArray(validatedData[field])) {
-      validatedData[field] = [validatedData[field]].filter(Boolean);
-    }
-  });
-
-  // Valida la struttura dei links
-  if (typeof validatedData.links !== 'object') {
-    validatedData.links = {};
-  }
-
-  return validatedData;
-}
-
-// Funzione per determinare la categoria del progetto
-function determineCategory(repoTopics, description, techStack) {
-  const categoryKeywords = {
-    map: ['map', 'maps', 'maplibre', 'leaflet', 'gis', 'geospatial', 'mapbox', 'webgis'],
-    visualization: ['visualization', 'chart', 'graph', 'plot', 'dashboard', '3d', 'three', 'visual', 'd3'],
-    analysis: ['analysis', 'data', 'statistics', 'analytics', 'pandas', 'numpy', 'geopandas'],
-    tool: ['tool', 'utility', 'helper', 'plugin', 'template', 'library']
-  };
-
-  // Controlla prima nel techStack
-  if (techStack.mapping && techStack.mapping.length > 0) {
-    return 'map';
-  }
-  if (techStack.visualization && techStack.visualization.length > 0) {
-    return 'visualization';
-  }
-  if (techStack.dataProcessing && techStack.dataProcessing.length > 0) {
-    return 'analysis';
-  }
-
-  // Controlla nei topics del repository
-  for (const [category, keywords] of Object.entries(categoryKeywords)) {
-    if (repoTopics.some(topic => keywords.includes(topic.toLowerCase()))) {
-      return category;
+    } catch (error) {
+      // Continua a controllare il prossimo percorso
     }
   }
-
-  // Se non trova nei topics, cerca nella descrizione
-  const descLower = description.toLowerCase();
-  for (const [category, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(keyword => descLower.includes(keyword))) {
-      return category;
-    }
-  }
-
-  return 'other'; // Categoria di default
+  
+  return '/images/portfolio/placeholder.svg'; // Immagine di fallback
 }
 
 // Funzione principale per l'aggiornamento del portfolio
@@ -261,94 +285,64 @@ async function updatePortfolio() {
           console.log('Skipping main website repository');
           continue;
         }
-
-        let projectInfo;
-        let content;
-
-        try {
-          // Prova a ottenere il project-info.md
-          console.log('Attempting to fetch project-info.md...');
-          const { data: projectInfoResponse } = await octokit.repos.getContent({
-            owner: USERNAME,
-            repo: repo.name,
-            path: 'project-info.md',
-          });
-          content = Buffer.from(projectInfoResponse.content, 'base64').toString();
-          console.log('Found project-info.md');
-        } catch (error) {
-          // Se non esiste, crea un project-info.md di default
-          console.log('No project-info.md found, using default template');
-          content = DEFAULT_PROJECT_INFO(repo.name, repo.description);
-        }
-
-        projectInfo = validateProjectInfo(content);
-        console.log('Project info validated successfully');
-
+        
         // Ottieni i topics del repository
         console.log('Fetching repository topics...');
         const { data: topicsData } = await octokit.repos.getAllTopics({
           owner: USERNAME,
           repo: repo.name,
         });
-        console.log(`Topics found: ${topicsData.names.join(', ') || 'none'}`);
-
-        // Determina la categoria del progetto (usando anche il techStack)
-        const category = determineCategory(topicsData.names, repo.description || '', projectInfo.techStack);
+        const topics = topicsData.names || [];
+        console.log(`Topics found: ${topics.join(', ') || 'none'}`);
+        
+        // Ottieni i linguaggi usati nel repository
+        const { data: languagesData } = await octokit.repos.listLanguages({
+          owner: USERNAME,
+          repo: repo.name
+        });
+        const languages = Object.keys(languagesData);
+        console.log(`Languages found: ${languages.join(', ')}`);
+        
+        // Ottieni README per estrarre features
+        const readmeContent = await getReadmeContent(USERNAME, repo.name);
+        const features = extractFeaturesFromReadme(readmeContent);
+        console.log(`Features extracted: ${features.join(', ')}`);
+        
+        // Determina la categoria del progetto
+        const category = await determineCategory(repo, topics);
         console.log(`Determined category: ${category}`);
-
-        // Gestione delle immagini
-        const mediaFolder = path.join('public', 'portfolio-media', repo.name);
-        if (!fs.existsSync(mediaFolder)) {
-          fs.mkdirSync(mediaFolder, { recursive: true });
-        }
-
-        // Download e gestione dei media
-        if (projectInfo.media && projectInfo.media.length > 0) {
-          console.log('Processing media files...');
-          for (const media of projectInfo.media) {
-            if (media.type === 'image') {
-              const fileName = path.basename(media.url);
-              const localPath = path.join(mediaFolder, fileName);
-              
-              if (!fs.existsSync(localPath)) {
-                const mediaUrl = media.url.startsWith('http') 
-                  ? media.url 
-                  : `https://raw.githubusercontent.com/${USERNAME}/${repo.name}/main/${media.url}`;
-                
-                await downloadFile(mediaUrl, localPath);
-                media.url = `/portfolio-media/${repo.name}/${fileName}`;
-                console.log(`Downloaded media: ${fileName}`);
-              }
-            }
-          }
-        }
-
+        
+        // Cerca screenshot del progetto
+        const imageUrl = await getThumbnailImage(repo);
+        console.log(`Image URL: ${imageUrl}`);
+        
+        // Organizza i linguaggi in tech stack
+        const techStack = organizeTechStack(languages, topics);
+        console.log('Tech stack organized');
+        
         // Composizione dei dati del progetto
         const projectData = {
           id: repo.name,
-          title: projectInfo.title,
-          description: projectInfo.description,
-          imageUrl: projectInfo.media && projectInfo.media[0] 
-            ? projectInfo.media[0].url 
-            : '/images/portfolio/placeholder.svg',
+          title: repo.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), // Formatta il nome
+          description: repo.description || `Un progetto di ${USERNAME}`,
+          imageUrl: imageUrl,
           category: category,
-          techStack: projectInfo.techStack,
-          technologies: flattenTechStack(projectInfo.techStack),
-          tags: [...new Set([...projectInfo.tags, ...topicsData.names])],
-          year: new Date(projectInfo.startDate).getFullYear(),
+          techStack: techStack,
+          technologies: flattenTechStack(techStack),
+          tags: [...new Set(topics)],
+          year: new Date(repo.created_at).getFullYear(),
           links: {
-            ...projectInfo.links,
             github: repo.html_url,
-            live: projectInfo.links.live || `https://${USERNAME}.github.io/${repo.name}/`
+            live: `https://${USERNAME}.github.io/${repo.name}/`
           },
-          features: projectInfo.features,
-          isTemplate: repo.name.toLowerCase().includes('template'),
+          features: features,
+          isTemplate: repo.name.toLowerCase().includes('template') || repo.is_template,
           lastUpdate: repo.updated_at,
-          status: projectInfo.status,
+          status: repo.archived ? 'archived' : 'active',
           priority: priority++
         };
 
-        console.log('Project data compiled:', projectData);
+        console.log('Project data compiled successfully');
         portfolioData.push(projectData);
         console.log('Project added to portfolio data');
       } catch (error) {

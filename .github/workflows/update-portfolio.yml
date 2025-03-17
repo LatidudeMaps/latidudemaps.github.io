@@ -40,8 +40,8 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          # Assicurati che le dipendenze siano installate nella versione corretta
-          npm install @octokit/rest gray-matter
+          # Assicurati che @octokit/rest sia installato nella versione corretta
+          npm install @octokit/rest
 
       - name: Create directories
         run: |
