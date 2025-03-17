@@ -9,26 +9,51 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-const ORGANIZATION = 'LatidudeMaps';
+const USERNAME = 'LatidudeMaps';
+const OUTPUT_PATH = 'public/data/portfolio-data.json';
 
 // Template per project-info.md di default
 const DEFAULT_PROJECT_INFO = (repoName, description = '') => `---
 title: ${repoName}
-description: ${description || 'A cool project by LatidudeMaps'}
+description: ${description || 'Un progetto di LatidudeMaps'}
 startDate: ${new Date().toISOString().split('T')[0]}
 status: active
-longDescription: |
-  This project is part of the LatidudeMaps portfolio.
-  More information coming soon!
-technologies:
-  - Web
+category: other
+
+techStack:
+  core:
+    - JavaScript
+  mapping:
+    - MapLibre GL JS
+  styling:
+    - CSS
+  deployment:
+    - GitHub Pages
+
 tags:
-  - Work in Progress
-media: []
+  - webgis
+  - template
+
+features:
+  - Feature principale da definire
+  - Altre feature da aggiungere
+
+links:
+  live: https://${USERNAME}.github.io/${repoName}/
+
+media:
+  - type: image
+    url: images/placeholder.png
+    description: Screenshot del progetto
+
+longDescription: |
+  ${description || 'Documentazione del progetto in arrivo.'}
+  
+  Altre informazioni verranno aggiunte presto.
 ---
 
 # ${repoName}
-Project documentation coming soon.
+Documentazione completa in arrivo.
 `;
 
 // Funzione per scaricare un file
@@ -48,7 +73,21 @@ async function downloadFile(url, dest) {
   });
 }
 
-// Funzione per validare il project-info.md
+// Funzione per appiattire l'oggetto techStack in un array
+function flattenTechStack(techStack) {
+  if (!techStack) return [];
+  
+  return Object.values(techStack)
+    .reduce((acc, technologies) => {
+      if (Array.isArray(technologies)) {
+        return [...acc, ...technologies];
+      }
+      return acc;
+    }, [])
+    .filter(Boolean);
+}
+
+// Funzione per validare e sistemare il project-info.md
 function validateProjectInfo(content) {
   const { data } = matter(content);
   const requiredFields = [
@@ -56,56 +95,121 @@ function validateProjectInfo(content) {
     'description',
     'startDate',
     'status',
-    'longDescription',
-    'technologies',
-    'tags'
+    'category',
+    'techStack',
+    'tags',
+    'features',
+    'links',
+    'media',
+    'longDescription'
   ];
 
-  const missingFields = requiredFields.filter(field => !data[field]);
-  
-  if (missingFields.length > 0) {
-    console.warn(`Warning: Missing fields will be filled with default values: ${missingFields.join(', ')}`);
-    // Riempi i campi mancanti con valori di default
-    missingFields.forEach(field => {
+  const validatedData = { ...data };
+
+  // Valida e correggi i campi mancanti
+  requiredFields.forEach(field => {
+    if (!validatedData[field]) {
+      console.warn(`Warning: Missing field '${field}', using default value`);
       switch(field) {
         case 'title':
-          data.title = data.title || 'Untitled Project';
+          validatedData.title = 'Untitled Project';
           break;
         case 'description':
-          data.description = data.description || 'A cool project by LatidudeMaps';
+          validatedData.description = 'Un progetto di LatidudeMaps';
           break;
         case 'startDate':
-          data.startDate = data.startDate || new Date().toISOString().split('T')[0];
+          validatedData.startDate = new Date().toISOString().split('T')[0];
           break;
         case 'status':
-          data.status = data.status || 'active';
+          validatedData.status = 'active';
           break;
-        case 'longDescription':
-          data.longDescription = data.longDescription || 'Project documentation coming soon.';
+        case 'category':
+          validatedData.category = 'other';
           break;
-        case 'technologies':
-          data.technologies = data.technologies || ['Web'];
+        case 'techStack':
+          validatedData.techStack = {
+            core: ['JavaScript'],
+            deployment: ['GitHub Pages']
+          };
           break;
         case 'tags':
-          data.tags = data.tags || ['Work in Progress'];
+          validatedData.tags = ['Work in Progress'];
+          break;
+        case 'features':
+          validatedData.features = ['Feature da definire'];
+          break;
+        case 'links':
+          validatedData.links = {};
+          break;
+        case 'media':
+          validatedData.media = [];
+          break;
+        case 'longDescription':
+          validatedData.longDescription = 'Documentazione del progetto in arrivo.';
           break;
       }
-    });
+    }
+  });
+
+  // Valida la struttura del techStack
+  const validTechCategories = [
+    'core',
+    'mapping',
+    'visualization',
+    'frameworks',
+    'styling',
+    'dataProcessing',
+    'deployment'
+  ];
+
+  if (typeof validatedData.techStack !== 'object') {
+    validatedData.techStack = {};
   }
 
-  return data;
+  validTechCategories.forEach(category => {
+    if (!validatedData.techStack[category]) {
+      validatedData.techStack[category] = [];
+    } else if (!Array.isArray(validatedData.techStack[category])) {
+      validatedData.techStack[category] = [validatedData.techStack[category]].filter(Boolean);
+    }
+  });
+
+  // Assicurati che i campi array siano effettivamente array
+  ['tags', 'features', 'media'].forEach(field => {
+    if (!Array.isArray(validatedData[field])) {
+      validatedData[field] = [validatedData[field]].filter(Boolean);
+    }
+  });
+
+  // Valida la struttura dei links
+  if (typeof validatedData.links !== 'object') {
+    validatedData.links = {};
+  }
+
+  return validatedData;
 }
 
 // Funzione per determinare la categoria del progetto
-function determineCategory(repoTopics, description) {
+function determineCategory(repoTopics, description, techStack) {
   const categoryKeywords = {
-    map: ['map', 'maplibre', 'leaflet', 'gis', 'geospatial'],
-    visualization: ['visualization', 'chart', 'graph', 'plot', 'dashboard'],
-    analysis: ['analysis', 'data', 'statistics', 'analytics'],
-    tool: ['tool', 'utility', 'helper', 'plugin']
+    map: ['map', 'maps', 'maplibre', 'leaflet', 'gis', 'geospatial', 'mapbox', 'webgis'],
+    visualization: ['visualization', 'chart', 'graph', 'plot', 'dashboard', '3d', 'three', 'visual', 'd3'],
+    analysis: ['analysis', 'data', 'statistics', 'analytics', 'pandas', 'numpy', 'geopandas'],
+    tool: ['tool', 'utility', 'helper', 'plugin', 'template', 'library']
   };
 
-  // Controlla prima nei topics del repository
+  // Controlla prima nel techStack
+  if (techStack.mapping && techStack.mapping.length > 0) {
+    return 'map';
+  }
+  if (techStack.visualization && techStack.visualization.length > 0) {
+    return 'visualization';
+  }
+  if (techStack.dataProcessing && techStack.dataProcessing.length > 0) {
+    return 'analysis';
+  }
+
+  // Controlla nei topics del repository
   for (const [category, keywords] of Object.entries(categoryKeywords)) {
     if (repoTopics.some(topic => keywords.includes(topic.toLowerCase()))) {
       return category;
@@ -127,12 +231,12 @@ function determineCategory(repoTopics, description) {
 async function updatePortfolio() {
   try {
     console.log('Starting portfolio update...');
-    console.log(`Fetching repositories for organization: ${ORGANIZATION}`);
+    console.log(`Fetching repositories for user: ${USERNAME}`);
 
-    // Ottieni tutti i repository pubblici dell'organizzazione
-    const { data: repos } = await octokit.repos.listForOrg({
-      org: ORGANIZATION,
-      type: 'public',
+    // Ottieni tutti i repository pubblici dell'utente
+    const { data: repos } = await octokit.repos.listForUser({
+      username: USERNAME,
+      type: 'owner',
       sort: 'updated',
       per_page: 100
     });
@@ -148,7 +252,7 @@ async function updatePortfolio() {
         console.log(`\nProcessing repository: ${repo.name}`);
         
         // Ignora il repository del sito principale
-        if (repo.name === `${ORGANIZATION}.github.io`) {
+        if (repo.name === `${USERNAME}.github.io`) {
           console.log('Skipping main website repository');
           continue;
         }
@@ -160,7 +264,7 @@ async function updatePortfolio() {
           // Prova a ottenere il project-info.md
           console.log('Attempting to fetch project-info.md...');
           const { data: projectInfoResponse } = await octokit.repos.getContent({
-            owner: ORGANIZATION,
+            owner: USERNAME,
             repo: repo.name,
             path: 'project-info.md',
           });
@@ -178,13 +282,13 @@ async function updatePortfolio() {
         // Ottieni i topics del repository
         console.log('Fetching repository topics...');
         const { data: topicsData } = await octokit.repos.getAllTopics({
-          owner: ORGANIZATION,
+          owner: USERNAME,
           repo: repo.name,
         });
         console.log(`Topics found: ${topicsData.names.join(', ') || 'none'}`);
 
-        // Determina la categoria del progetto
-        const category = determineCategory(topicsData.names, repo.description || '');
+        // Determina la categoria del progetto (usando anche il techStack)
+        const category = determineCategory(topicsData.names, repo.description || '', projectInfo.techStack);
         console.log(`Determined category: ${category}`);
 
         // Gestione delle immagini
@@ -204,7 +308,7 @@ async function updatePortfolio() {
               if (!fs.existsSync(localPath)) {
                 const mediaUrl = media.url.startsWith('http') 
                   ? media.url 
-                  : `https://raw.githubusercontent.com/${ORGANIZATION}/${repo.name}/main/${media.url}`;
+                  : `https://raw.githubusercontent.com/${USERNAME}/${repo.name}/main/${media.url}`;
                 
                 await downloadFile(mediaUrl, localPath);
                 media.url = `/portfolio-media/${repo.name}/${fileName}`;
@@ -216,15 +320,27 @@ async function updatePortfolio() {
 
         // Composizione dei dati del progetto
         const projectData = {
-          ...projectInfo,
-          repoName: repo.name,
-          category,
-          priority: priority++,
-          githubUrl: repo.html_url,
-          pagesUrl: `https://${ORGANIZATION}.github.io/${repo.name}/`,
+          id: repo.name,
+          title: projectInfo.title,
+          description: projectInfo.description,
+          imageUrl: projectInfo.media && projectInfo.media[0] 
+            ? projectInfo.media[0].url 
+            : '/images/portfolio/placeholder.svg',
+          category: category,
+          techStack: projectInfo.techStack,
+          technologies: flattenTechStack(projectInfo.techStack),
+          tags: [...new Set([...projectInfo.tags, ...topicsData.names])],
+          year: new Date(projectInfo.startDate).getFullYear(),
+          links: {
+            ...projectInfo.links,
+            github: repo.html_url,
+            live: projectInfo.links.live || `https://${USERNAME}.github.io/${repo.name}/`
+          },
+          features: projectInfo.features,
+          isTemplate: repo.name.toLowerCase().includes('template'),
           lastUpdate: repo.updated_at,
-          stars: repo.stargazers_count,
-          tags: [...new Set([...projectInfo.tags, ...topicsData.names])], // Unione dei tag con i topics
+          status: projectInfo.status,
+          priority: priority++
         };
 
         console.log('Project data compiled:', projectData);
@@ -242,11 +358,14 @@ async function updatePortfolio() {
     console.log('\nWriting portfolio data...');
     console.log(`Total projects: ${portfolioData.length}`);
 
+    // Assicurati che la directory esista
+    const outputDir = path.dirname(OUTPUT_PATH);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
     // Salva i dati aggiornati
-    fs.writeFileSync(
-      'src/config/portfolio-data.json',
-      JSON.stringify(portfolioData, null, 2)
-    );
+    fs.writeFileSync(OUTPUT_PATH, JSON.stringify(portfolioData, null, 2));
 
     console.log('Portfolio data updated successfully!');
   } catch (error) {

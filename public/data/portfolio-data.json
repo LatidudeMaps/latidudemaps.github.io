@@ -1,75 +1,148 @@
 [
   {
+    "id": "latidudemaps.github.io",
+    "title": "latidudemaps.github.io",
+    "description": "Un progetto di LatidudeMaps",
+    "imageUrl": "/images/portfolio/placeholder.svg",
+    "category": "other",
+    "tags": [
+      "Work in Progress"
+    ],
+    "year": 2025,
+    "link": "https://LatidudeMaps.github.io/latidudemaps.github.io/",
+    "features": [
+      "Questo progetto fa parte del portfolio di LatidudeMaps.",
+      "Maggiori informazioni in arrivo!"
+    ],
+    "technologies": [
+      "Web"
+    ],
+    "isTemplate": false,
+    "lastUpdate": "2025-03-17T14:24:23Z",
+    "githubUrl": "https://github.com/LatidudeMaps/latidudemaps.github.io",
+    "status": "active",
+    "priority": 1
+  },
+  {
     "id": "maplibre_template",
     "title": "maplibre_template",
     "description": "Template per una mappa interattiva con MapLibre",
     "imageUrl": "/images/portfolio/placeholder.svg",
     "category": "map",
     "tags": [
-      "JavaScript",
-      "CSS",
-      "HTML"
+      "Work in Progress"
     ],
-    "year": 2024,
-    "link": "https://latidudemaps.github.io/maplibre_template/",
+    "year": 2025,
+    "link": "https://LatidudeMaps.github.io/maplibre_template/",
     "features": [
-      "Feature principale 1",
-      "Feature principale 2",
-      "Feature principale 3"
+      "Questo progetto fa parte del portfolio di LatidudeMaps.",
+      "Maggiori informazioni in arrivo!"
     ],
     "technologies": [
-      "JavaScript",
-      "CSS",
-      "HTML"
+      "Web",
+      "mapping",
+      "ciao"
     ],
-    "isTemplate": true
+    "isTemplate": true,
+    "lastUpdate": "2025-03-15T13:06:04Z",
+    "githubUrl": "https://github.com/LatidudeMaps/maplibre_template",
+    "status": "active",
+    "priority": 2
   },
   {
-    "id": "mountainatlas",
+    "id": "MountainAtlas",
     "title": "MountainAtlas",
-    "description": "Descrizione da aggiungere",
+    "description": "Un progetto di LatidudeMaps",
     "imageUrl": "/images/portfolio/placeholder.svg",
-    "category": "visualization",
+    "category": "other",
     "tags": [
-      "JavaScript",
-      "CSS",
-      "HTML"
+      "Work in Progress"
     ],
-    "year": 2024,
-    "link": "https://latidudemaps.github.io/MountainAtlas/",
+    "year": 2025,
+    "link": "https://LatidudeMaps.github.io/MountainAtlas/",
     "features": [
-      "Feature principale 1",
-      "Feature principale 2",
-      "Feature principale 3"
+      "Questo progetto fa parte del portfolio di LatidudeMaps.",
+      "Maggiori informazioni in arrivo!"
     ],
     "technologies": [
-      "JavaScript",
-      "CSS",
-      "HTML"
+      "Web"
     ],
-    "isTemplate": true
+    "isTemplate": false,
+    "lastUpdate": "2025-03-08T16:33:05Z",
+    "githubUrl": "https://github.com/LatidudeMaps/MountainAtlas",
+    "status": "active",
+    "priority": 3
   },
   {
-    "id": "geologiavda",
+    "id": "GeologiaVDA",
     "title": "GeologiaVDA",
     "description": "3D Geological Map of Val d'Agri (Basilicata, Italy) - CC BY-NC-ND 4.0",
     "imageUrl": "/images/portfolio/placeholder.svg",
-    "category": "visualization",
+    "category": "map",
     "tags": [
-      "JavaScript",
-      "HTML"
+      "Work in Progress"
     ],
-    "year": 2024,
-    "link": "https://latidudemaps.github.io/GeologiaVDA/",
+    "year": 2025,
+    "link": "https://LatidudeMaps.github.io/GeologiaVDA/",
     "features": [
-      "Feature principale 1",
-      "Feature principale 2",
-      "Feature principale 3"
+      "Questo progetto fa parte del portfolio di LatidudeMaps.",
+      "Maggiori informazioni in arrivo!"
     ],
     "technologies": [
-      "JavaScript",
-      "HTML"
+      "Web"
     ],
-    "isTemplate": true
+    "isTemplate": false,
+    "lastUpdate": "2025-03-08T16:33:02Z",
+    "githubUrl": "https://github.com/LatidudeMaps/GeologiaVDA",
+    "status": "active",
+    "priority": 4
+  },
+  {
+    "id": "30DayMapChallenge",
+    "title": "30DayMapChallenge",
+    "description": "All my @30DayMapChallenge 2022 entries",
+    "imageUrl": "/images/portfolio/placeholder.svg",
+    "category": "map",
+    "tags": [
+      "Work in Progress"
+    ],
+    "year": 2025,
+    "link": "https://LatidudeMaps.github.io/30DayMapChallenge/",
+    "features": [
+      "Questo progetto fa parte del portfolio di LatidudeMaps.",
+      "Maggiori informazioni in arrivo!"
+    ],
+    "technologies": [
+      "Web"
+    ],
+    "isTemplate": false,
+    "lastUpdate": "2024-11-01T00:21:34Z",
+    "githubUrl": "https://github.com/LatidudeMaps/30DayMapChallenge",
+    "status": "active",
+    "priority": 5
+  },
+  {
+    "id": "RandomMaps_2023",
+    "title": "RandomMaps_2023",
+    "description": "Here are stored my random exercises in full resolution",
+    "imageUrl": "/images/portfolio/placeholder.svg",
+    "category": "other",
+    "tags": [
+      "Work in Progress"
+    ],
+    "year": 2025,
+    "link": "https://LatidudeMaps.github.io/RandomMaps_2023/",
+    "features": [
+      "Questo progetto fa parte del portfolio di LatidudeMaps.",
+      "Maggiori informazioni in arrivo!"
+    ],
+    "technologies": [
+      "Web"
+    ],
+    "isTemplate": false,
+    "lastUpdate": "2023-01-17T12:29:45Z",
+    "githubUrl": "https://github.com/LatidudeMaps/RandomMaps_2023",
+    "status": "active",
+    "priority": 6
   }
 ]
