@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { Globe, Map, BarChart2, FileSearch, Tool } from 'lucide-react';
+import { Globe, Map, BarChart2, FileSearch, Wrench } from 'lucide-react';
 
 interface CategoryFilterProps {
   selectedCategory: string;
@@ -12,7 +12,7 @@ const categories = [
   { id: 'map', label: 'Mappe', Icon: Map },
   { id: 'visualization', label: 'Visualizzazioni', Icon: BarChart2 },
   { id: 'analysis', label: 'Analisi', Icon: FileSearch },
-  { id: 'tool', label: 'Tools', Icon: Tool },
+  { id: 'tool', label: 'Tools', Icon: Wrench },
 ];
 
 export default function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {
