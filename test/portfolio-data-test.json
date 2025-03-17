@@ -1,0 +1,170 @@
+[
+  {
+    "title": "maplibre_template",
+    "description": "Template per una mappa interattiva con MapLibre",
+    "startDate": "2024-01-01",
+    "endDate": "ongoing",
+    "status": "ongoing",
+    "longDescription": "Template per una mappa interattiva con MapLibre\n\n- Feature principale 1\n- Feature principale 2\n- Feature principale 3\n",
+    "technologies": [
+      {
+        "name": "JavaScript",
+        "icon": "code",
+        "url": "https://example.com"
+      },
+      {
+        "name": "CSS",
+        "icon": "code",
+        "url": "https://example.com"
+      },
+      {
+        "name": "HTML",
+        "icon": "code",
+        "url": "https://example.com"
+      }
+    ],
+    "links": [
+      {
+        "type": "demo",
+        "url": "https://latidudemaps.github.io/maplibre_template/",
+        "label": "Live Demo"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/LatidudeMaps/maplibre_template",
+        "label": "Source Code"
+      }
+    ],
+    "media": [
+      {
+        "type": "image",
+        "url": "/images/portfolio/placeholder.svg",
+        "alt": "Screenshot principale",
+        "caption": "Vista principale del progetto"
+      }
+    ],
+    "tags": [
+      "JavaScript",
+      "CSS",
+      "HTML"
+    ],
+    "repoName": "maplibre_template",
+    "category": "map",
+    "priority": 1,
+    "githubUrl": "https://github.com/LatidudeMaps/maplibre_template",
+    "pagesUrl": "https://latidudemaps.github.io/maplibre_template/",
+    "lastUpdate": "2025-03-15T13:06:04Z",
+    "stars": 1,
+    "isTemplate": true
+  },
+  {
+    "title": "MountainAtlas",
+    "description": "Descrizione da aggiungere",
+    "startDate": "2024-01-01",
+    "endDate": "ongoing",
+    "status": "ongoing",
+    "longDescription": "Aggiungi qui una descrizione dettagliata del progetto.\n\n- Feature principale 1\n- Feature principale 2\n- Feature principale 3\n",
+    "technologies": [
+      {
+        "name": "JavaScript",
+        "icon": "code",
+        "url": "https://example.com"
+      },
+      {
+        "name": "CSS",
+        "icon": "code",
+        "url": "https://example.com"
+      },
+      {
+        "name": "HTML",
+        "icon": "code",
+        "url": "https://example.com"
+      }
+    ],
+    "links": [
+      {
+        "type": "demo",
+        "url": "https://latidudemaps.github.io/MountainAtlas/",
+        "label": "Live Demo"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/LatidudeMaps/MountainAtlas",
+        "label": "Source Code"
+      }
+    ],
+    "media": [
+      {
+        "type": "image",
+        "url": "/images/portfolio/placeholder.svg",
+        "alt": "Screenshot principale",
+        "caption": "Vista principale del progetto"
+      }
+    ],
+    "tags": [
+      "JavaScript",
+      "CSS",
+      "HTML"
+    ],
+    "repoName": "MountainAtlas",
+    "category": "visualization",
+    "priority": 2,
+    "githubUrl": "https://github.com/LatidudeMaps/MountainAtlas",
+    "pagesUrl": "https://latidudemaps.github.io/MountainAtlas/",
+    "lastUpdate": "2025-03-08T16:33:05Z",
+    "stars": 1,
+    "isTemplate": true
+  },
+  {
+    "title": "GeologiaVDA",
+    "description": "3D Geological Map of Val d'Agri (Basilicata, Italy) - CC BY-NC-ND 4.0",
+    "startDate": "2024-01-01",
+    "endDate": "ongoing",
+    "status": "ongoing",
+    "longDescription": "3D Geological Map of Val d'Agri (Basilicata, Italy) - CC BY-NC-ND 4.0\n\n- Feature principale 1\n- Feature principale 2\n- Feature principale 3\n",
+    "technologies": [
+      {
+        "name": "JavaScript",
+        "icon": "code",
+        "url": "https://example.com"
+      },
+      {
+        "name": "HTML",
+        "icon": "code",
+        "url": "https://example.com"
+      }
+    ],
+    "links": [
+      {
+        "type": "demo",
+        "url": "https://latidudemaps.github.io/GeologiaVDA/",
+        "label": "Live Demo"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/LatidudeMaps/GeologiaVDA",
+        "label": "Source Code"
+      }
+    ],
+    "media": [
+      {
+        "type": "image",
+        "url": "/images/portfolio/placeholder.svg",
+        "alt": "Screenshot principale",
+        "caption": "Vista principale del progetto"
+      }
+    ],
+    "tags": [
+      "JavaScript",
+      "HTML"
+    ],
+    "repoName": "GeologiaVDA",
+    "category": "visualization",
+    "priority": 3,
+    "githubUrl": "https://github.com/LatidudeMaps/GeologiaVDA",
+    "pagesUrl": "https://latidudemaps.github.io/GeologiaVDA/",
+    "lastUpdate": "2025-03-08T16:33:02Z",
+    "stars": 1,
+    "isTemplate": true
+  }
+]

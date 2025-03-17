@@ -1,0 +1,46 @@
+{
+  "repositories": [
+    {
+      "name": "maplibre_template",
+      "category": "map",
+      "tags": [
+        "JavaScript",
+        "CSS",
+        "HTML"
+      ],
+      "priority": 1,
+      "pagesUrl": "https://latidudemaps.github.io/maplibre_template/",
+      "description": "Template per una mappa interattiva con MapLibre"
+    },
+    {
+      "name": "MountainAtlas",
+      "category": "visualization",
+      "tags": [
+        "JavaScript",
+        "CSS",
+        "HTML"
+      ],
+      "priority": 2,
+      "pagesUrl": "https://latidudemaps.github.io/MountainAtlas/",
+      "description": ""
+    },
+    {
+      "name": "GeologiaVDA",
+      "category": "visualization",
+      "tags": [
+        "JavaScript",
+        "HTML"
+      ],
+      "priority": 3,
+      "pagesUrl": "https://latidudemaps.github.io/GeologiaVDA/",
+      "description": "3D Geological Map of Val d'Agri (Basilicata, Italy) - CC BY-NC-ND 4.0"
+    }
+  ],
+  "settings": {
+    "username": "LatidudeMaps",
+    "screenshotDelay": 2000,
+    "requiredFiles": [
+      "project-info.md"
+    ]
+  }
+}

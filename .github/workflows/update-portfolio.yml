@@ -1,0 +1,56 @@
+name: Update Portfolio Data
+
+on:
+  # Si attiva quando viene fatto push su qualsiasi repository con GitHub Pages
+  repository_dispatch:
+    types: [pages_built]
+  
+  # Si attiva una volta al giorno alle 00:00 UTC
+  schedule:
+    - cron: '0 0 * * *'
+  
+  # Permette l'attivazione manuale
+  workflow_dispatch:
+
+jobs:
+  update-portfolio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create media directory
+        run: mkdir -p public/portfolio-media
+
+      - name: Update portfolio data
+        run: npm run update-portfolio
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Optimize images
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jpegoptim pngquant
+          find public/portfolio-media -type f -name "*.jpg" -exec jpegoptim --max=85 {} \;
+          find public/portfolio-media -type f -name "*.png" -exec pngquant --force --quality=65-80 {} \;
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add src/config/portfolio-data.json public/portfolio-media
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update portfolio data and media" && git push)
+
+      - name: Check for validation errors
+        if: failure()
+        run: |
+          echo "::error::Portfolio update failed. Please check the project-info.md files in your repositories for validation errors."
