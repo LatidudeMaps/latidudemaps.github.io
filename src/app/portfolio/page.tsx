@@ -87,8 +87,7 @@ export default function Portfolio() {
         </h1>
         
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Esplora la nostra collezione di progetti di cartografia digitale, 
-          visualizzazioni dati e analisi geografiche
+          Esplora tutti i miei progetti!
         </p>
       </motion.div>
 
