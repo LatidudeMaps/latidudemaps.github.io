@@ -1,8 +1,8 @@
-import { Project } from '@/config/portfolio';
+import { Project } from '@/lib/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { ExternalLink, Tag } from 'lucide-react';
+import TechBadge from './TechBadge';
 
 interface ProjectDetailProps {
   project: Project;
@@ -33,10 +33,27 @@ const ProjectDetail = ({ project, isOpen, onClose }: ProjectDetailProps) => {
               {project.description}
             </p>
 
-            {project.features && (
+            {/* Technologies */}
+            {project.technologies && project.technologies.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Tecnologie Utilizzate</h3>
+                <div className="flex flex-wrap gap-2">
+                  {project.technologies.map((tech) => (
+                    <TechBadge
+                      key={tech}
+                      tech={tech}
+                      category={getTechCategory(tech, project)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Features */}
+            {project.features && project.features.length > 0 && (
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">Caratteristiche Principali</h3>
-                <ul className="list-disc list-inside space-y-1">
+                <ul className="list-disc pl-5 space-y-1">
                   {project.features.map((feature, index) => (
                     <li key={index} className="text-gray-700 dark:text-gray-300">
                       {feature}
@@ -46,50 +63,84 @@ const ProjectDetail = ({ project, isOpen, onClose }: ProjectDetailProps) => {
               </div>
             )}
 
-            {project.technologies && (
+            {/* Tags */}
+            {project.tags && project.tags.length > 0 && (
               <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Tecnologie Utilizzate</h3>
+                <h3 className="text-xl font-semibold">Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {project.technologies.map((tech, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full text-sm"
+                  {project.tags.map((tag) => (
+                    <div
+                      key={tag}
+                      className="flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full"
                     >
-                      {tech}
-                    </span>
+                      <Tag size={14} />
+                      <span className="text-sm">{tag}</span>
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <div
-                  key={tag}
-                  className="flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full"
+            {/* Links */}
+            <div className="flex flex-wrap gap-4 pt-4">
+              {project.githubUrl && (
+                <a
+                  href={project.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
                 >
-                  <Tag size={14} />
-                  <span className="text-sm">{tag}</span>
-                </div>
-              ))}
+                  Vedi su GitHub
+                  <ExternalLink size={16} />
+                </a>
+              )}
+              
+              {project.link && (
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-opacity-90 transition-colors"
+                >
+                  Visita il Progetto
+                  <ExternalLink size={16} />
+                </a>
+              )}
             </div>
-
-            {project.link && (
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Visita il Progetto
-                <ExternalLink size={16} />
-              </a>
-            )}
           </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 };
+
+// Funzione per determinare la categoria di una tecnologia (uguale a quella usata in ProjectCard)
+function getTechCategory(tech: string, project: Project): string {
+  const techLower = tech.toLowerCase();
+  
+  const categoryMappings: Record<string, string[]> = {
+    core: ['javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'go', 'rust'],
+    mapping: ['maplibre', 'leaflet', 'mapbox', 'openlayers', 'arcgis', 'qgis', 'gis'],
+    visualization: ['d3', 'three.js', 'plotly', 'chart.js', 'highcharts', 'tableau', 'powerbi'],
+    frameworks: ['react', 'vue', 'angular', 'svelte', 'next.js', 'nuxt', 'django', 'flask', 'express'],
+    styling: ['css', 'scss', 'sass', 'less', 'tailwind', 'bootstrap', 'styled-components'],
+    dataProcessing: ['pandas', 'numpy', 'scipy', 'geopandas', 'r', 'julia', 'matlab', 'sql'],
+    deployment: ['github-pages', 'netlify', 'vercel', 'aws', 'azure', 'gcp', 'heroku', 'docker']
+  };
+  
+  // Verifica in quale categoria rientra la tecnologia
+  for (const [category, techs] of Object.entries(categoryMappings)) {
+    if (techs.some(t => techLower.includes(t))) {
+      return category;
+    }
+  }
+  
+  // Se è nei tag del progetto, potrebbe essere una tecnologia specifica
+  if (project.tags.some(tag => tag.toLowerCase() === techLower)) {
+    return 'tags';
+  }
+  
+  return 'other';
+}
 
 export default ProjectDetail;

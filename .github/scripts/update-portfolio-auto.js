@@ -16,6 +16,12 @@ const octokit = new Octokit({
 const USERNAME = 'LatidudeMaps';
 const OUTPUT_PATH = 'public/data/portfolio-data.json';
 
+// Lista dei repository da escludere
+const EXCLUDED_REPOS = [
+  'latidudemaps.github.io', // Repository del sito principale
+  // Aggiungi qui altri repository da escludere in futuro se necessario
+];
+
 // Funzione per scaricare un file
 async function downloadFile(url, dest) {
   return new Promise((resolve, reject) => {
@@ -261,6 +267,7 @@ async function updatePortfolio() {
   try {
     console.log('Starting portfolio update...');
     console.log(`Fetching repositories for user: ${USERNAME}`);
+    console.log(`Repositories to exclude: ${EXCLUDED_REPOS.join(', ')}`);
 
     // Ottieni tutti i repository pubblici dell'utente
     const { data: repos } = await octokit.repos.listForUser({
@@ -280,9 +287,9 @@ async function updatePortfolio() {
       try {
         console.log(`\nProcessing repository: ${repo.name}`);
         
-        // Ignora il repository del sito principale
-        if (repo.name === `${USERNAME}.github.io`) {
-          console.log('Skipping main website repository');
+        // Ignora i repository nella lista di esclusione
+        if (EXCLUDED_REPOS.includes(repo.name)) {
+          console.log(`Skipping excluded repository: ${repo.name}`);
           continue;
         }
         

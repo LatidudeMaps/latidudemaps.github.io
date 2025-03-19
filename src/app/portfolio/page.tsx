@@ -4,24 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProjectCard from '@/components/portfolio/ProjectCard';
 import { Loader2 } from 'lucide-react';
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  category: string;
-  technologies: string[];
-  tags: string[];
-  year: number;
-  link: string;
-  githubUrl?: string;
-  features: string[];
-  isTemplate: boolean;
-  lastUpdate: string;
-  status: string;
-  priority: number;
-}
+import { Project } from '@/lib/types';
 
 export default function Portfolio() {
   const [projects, setProjects] = useState<Project[]>([]);

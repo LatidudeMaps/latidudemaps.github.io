@@ -10,24 +10,8 @@ import {
 } from '@/components/ui/card';
 import { Github, ExternalLink, Tags } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  category: string;
-  technologies: string[];
-  tags: string[];
-  year: number;
-  link: string;
-  githubUrl?: string;
-  features: string[];
-  isTemplate: boolean;
-  lastUpdate: string;
-  status: string;
-  priority: number;
-}
+import TechBadge from './TechBadge';
+import { Project } from '@/lib/types';
 
 interface ProjectCardProps {
   project: Project;
@@ -72,13 +56,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           {/* Technologies */}
           <div className="flex flex-wrap gap-2 mb-4">
             {project.technologies.map((tech) => (
-              <Badge
+              <TechBadge
                 key={tech}
-                variant="outline"
-                className="text-xs"
-              >
-                {tech}
-              </Badge>
+                tech={tech}
+                category={getTechCategory(tech, project)}
+              />
             ))}
           </div>
 
@@ -138,4 +120,33 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </Card>
     </motion.div>
   );
+}
+
+// Funzione per determinare la categoria di una tecnologia
+function getTechCategory(tech: string, project: Project): string {
+  const techLower = tech.toLowerCase();
+  
+  const categoryMappings: Record<string, string[]> = {
+    core: ['javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'go', 'rust'],
+    mapping: ['maplibre', 'leaflet', 'mapbox', 'openlayers', 'arcgis', 'qgis', 'gis'],
+    visualization: ['d3', 'three.js', 'plotly', 'chart.js', 'highcharts', 'tableau', 'powerbi'],
+    frameworks: ['react', 'vue', 'angular', 'svelte', 'next.js', 'nuxt', 'django', 'flask', 'express'],
+    styling: ['css', 'scss', 'sass', 'less', 'tailwind', 'bootstrap', 'styled-components'],
+    dataProcessing: ['pandas', 'numpy', 'scipy', 'geopandas', 'r', 'julia', 'matlab', 'sql'],
+    deployment: ['github-pages', 'netlify', 'vercel', 'aws', 'azure', 'gcp', 'heroku', 'docker']
+  };
+  
+  // Verifica in quale categoria rientra la tecnologia
+  for (const [category, techs] of Object.entries(categoryMappings)) {
+    if (techs.some(t => techLower.includes(t))) {
+      return category;
+    }
+  }
+  
+  // Se è nei tag del progetto, potrebbe essere una tecnologia specifica
+  if (project.tags.some(tag => tag.toLowerCase() === techLower)) {
+    return 'tags';
+  }
+  
+  return 'other';
 }
